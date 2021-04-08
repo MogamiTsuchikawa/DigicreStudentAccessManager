@@ -17,7 +17,8 @@
                 <RowDefinition Height="3*"/>
             </Grid.RowDefinitions>
             <Label x:Name="StudentIDText" Content="AA00000さん" FontSize="48" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
-            <Label x:Name="StatusText" Content="入室" FontSize="90" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
+            <Label x:Name="StatusText" Content="入室" FontSize="90" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" Foreground="Red"/>
+            <Button x:Name="ShowInAccessLogListButton" Content="リスト表示" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="65" Height="44" Click="ShowInAccessLogListButton_Click"/>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
@@ -25,7 +26,7 @@
                 <ColumnDefinition Width="5*"/>
             </Grid.ColumnDefinitions>
             <Label Content="現在時刻" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="0" FontSize="48"/>
-            <Label Content="2021/04/08 02:23" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" FontSize="48"/>
+            <Label x:Name="ClockLabel" Content="2021/04/08 02:23" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1" FontSize="48"/>
         </Grid>
     </Grid>
 </Window>

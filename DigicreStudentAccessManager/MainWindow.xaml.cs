@@ -25,18 +25,22 @@ namespace DigicreStudentAccessManager
     {
         public MainWindow()
         {
+            currentDate = DateTime.Now;
+            targetFilePath = $"Log_{ DateTime.Now.ToShortDateString()}.csv";
             InitializeComponent();
         }
-        class AccessLog
+        public class AccessLog
         {
             public string studentId { get; set; }
             public DateTime inTime { get; set; }
         }
         private List<AccessLog> accessLogs = new List<AccessLog>();
         private string targetFilePath = "logs.csv";
+        private DateTime currentDate;
         private bool felicaCheckFlag = false;
         private void OnTimer(object sender,EventArgs e)
         {
+            ClockLabel.Content = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
             try
             {
                 using (Felica f = new Felica())
@@ -49,7 +53,7 @@ namespace DigicreStudentAccessManager
                     {
                         //見つからない場合
                         accessLogs.Add(new AccessLog() { studentId = studentId, inTime = DateTime.Now });
-                        File.AppendAllText(targetFilePath, $"{studentId},{accessLogs[accessLogs.Count - 1].inTime.ToShortTimeString()},入室\n");
+                        OutputLog(accessLogs[accessLogs.Count - 1], InOutKind.入室);
                         StatusText.Content = "入室";
                     }
                     else
@@ -58,8 +62,8 @@ namespace DigicreStudentAccessManager
                         var target = accessLogs.Find(al => al.studentId == studentId);
                         var passTime = DateTime.Now - target.inTime;
                         if (passTime < new TimeSpan(0, 0, 10)) return;
+                        OutputLog(target, InOutKind.退室);
                         accessLogs.Remove(target);
-                        File.AppendAllText(targetFilePath,$"{studentId},{DateTime.Now.ToShortTimeString()},退室\n");
                         StatusText.Content = "退室";
                     }
                     felicaCheckFlag = true;
@@ -72,6 +76,21 @@ namespace DigicreStudentAccessManager
                 felicaCheckFlag = false;
                 Console.WriteLine(ex.Message);
             }
+        }
+        enum InOutKind
+        {
+            入室,退室,異常終了
+        }
+        private void OutputLog(AccessLog accessLog,InOutKind inOutKind)
+        {
+            var currentTime = DateTime.Now;
+            if(currentDate.Day != currentTime.Day)
+            {
+                //path更新
+                targetFilePath = $"Log_{ currentTime.ToShortDateString()}.csv";
+            }
+            File.AppendAllText(targetFilePath, $"{accessLog.studentId},{currentTime.ToShortTimeString()},{inOutKind}\n");
+
         }
         private void AllViewClear()
         {
@@ -100,6 +119,12 @@ namespace DigicreStudentAccessManager
             timer.Interval = new TimeSpan(1000000);//0.1秒
             timer.Tick += new EventHandler(OnTimer);
             timer.Start();
+        }
+
+        private void ShowInAccessLogListButton_Click(object sender, RoutedEventArgs e)
+        {
+            var accessLogListView = new AccessLogListView(accessLogs);
+            accessLogListView.ShowDialog();
         }
     }
 }
